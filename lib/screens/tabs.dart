@@ -26,7 +26,9 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = const HomeScreen();
+    Widget activePage = HomeScreen(
+      selectPage: _selectPage,
+    );
     Widget leadingWidget = Image.asset(
       'assets/images/logo.png',
       color: Colors.white,

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:medileaf/app_state.dart';
+import 'package:provider/provider.dart';
 
 class SpeciesScreen extends StatefulWidget {
   @override
@@ -9,16 +12,18 @@ class SpeciesScreen extends StatefulWidget {
 class _SpeciesScreenState extends State<SpeciesScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: const Center(
-        child: Text('Explore',
-            style: TextStyle(
-              fontSize: 34,
-              fontWeight: FontWeight.w700,
-              color: Colors.black,
-            )),
-      ),
+    return Consumer<AppState>(
+      builder: (context, appState, _) {
+        if (appState.connectivityStatus == ConnectivityStatus.connected) {
+          return const Center(
+            child: Text("Explore"),
+          );
+        } else {
+          return const Center(
+            child: Text("No Internet connection"),
+          );
+        }
+      },
     );
   }
 }

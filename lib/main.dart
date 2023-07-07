@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import 'app_state.dart';
 
 import 'package:medileaf/screens/splash.dart';
 
@@ -17,10 +20,13 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: "MediLeaf",
-      debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+    return ChangeNotifierProvider<AppState>(
+      create: (context) => AppState(),
+      child: const MaterialApp(
+        title: "MediLeaf",
+        debugShowCheckedModeBanner: false,
+        home: SplashScreen(),
+      ),
     );
   }
 }

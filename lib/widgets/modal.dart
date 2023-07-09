@@ -1,19 +1,23 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:medileaf/widgets/prediction_card.dart';
+import 'package:medileaf/app_state.dart';
+
+typedef ShowResult = void Function(ConnectivityStatus connectivityStatus);
 
 class Modal extends StatelessWidget {
   final File image;
-  final List cardDataList;
+  final ConnectivityStatus connectivityStatus;
   final VoidCallback onClose;
+  final ShowResult showResult;
 
-  const Modal({
-    super.key,
-    required this.cardDataList,
-    required this.onClose,
-    required this.image,
-  });
+  const Modal(
+      {super.key,
+      required this.onClose,
+      required this.image,
+      required this.showResult,
+      required this.connectivityStatus});
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -22,34 +26,33 @@ class Modal extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.file(
-              image,
-              width: 240,
-              height: 240,
+            AspectRatio(
+              aspectRatio: 1,
+              child: Image.file(
+                image,
+                fit: BoxFit.cover,
+              ),
             ),
             const SizedBox(height: 16.0),
-            for (var cardData in cardDataList)
-              PredictionCard(
-                label: cardData['scientific_name'],
-                confidence: cardData['probability'],
-              ),
-            const SizedBox(height: 16.0),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: onClose,
+                  onPressed: () {
+                    showResult(connectivityStatus);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromRGBO(30, 156, 93, 1),
                   ),
-                  child: const Text('Close'),
+                  child: const Text('Confirm'),
                 ),
+                const SizedBox(width: 10.0),
                 TextButton(
                   style: TextButton.styleFrom(
                     foregroundColor: const Color.fromRGBO(30, 156, 93, 1),
                   ),
-                  onPressed: () {},
-                  child: const Text('Show More'),
+                  onPressed: onClose,
+                  child: const Text('Close'),
                 ),
               ],
             ),

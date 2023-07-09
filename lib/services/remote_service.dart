@@ -1,4 +1,4 @@
-import 'package:medileaf/api/base_client.dart';
+import 'package:medileaf/utils/base_client.dart';
 import 'package:medileaf/models/plant.dart';
 
 class RemoteService {
@@ -21,4 +21,18 @@ class RemoteService {
       rethrow;
     }
   }
+
+  // Future<List<Plant>> getPlants(String searchQuery, dynamic pageParams) async {
+  //   try {
+  //     final client = BaseClient();
+  //     var url =
+  //         'https://medi-leaf-backend.vercel.app/api/v1/plants/?search=$searchQuery&limit=${pageParams.limit}&offset=${pageParams.offset}';
+
+  //     final responseJson = await client.get(url);
+
+  //     return plantFromJson(responseJson);
+  //   } catch (error) {
+  //     rethrow;
+  //   }
+  // }
 }

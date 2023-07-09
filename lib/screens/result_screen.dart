@@ -116,7 +116,7 @@ class _ResultScreenState extends State<ResultScreen> {
                           Visibility(
                             visible: !_loading,
                             child: const Icon(
-                              Icons.error,
+                              Icons.error_outline,
                               size: 70,
                             ),
                           ),

@@ -25,11 +25,11 @@ class _PlantDetailsScreenState extends State<PlantDetailsScreen> {
 
       Plant plantDetails;
       if (scientificName.length == 2) {
-        plantDetails = await RemoteService()
-            .getPlantDetails(scientificName[0], scientificName[1]);
+        plantDetails = await RemoteService().getPlantDetailsByScientificName(
+            scientificName[0], scientificName[1]);
       } else {
-        plantDetails =
-            await RemoteService().getPlantDetails(scientificName[0], null);
+        plantDetails = await RemoteService()
+            .getPlantDetailsByScientificName(scientificName[0], null);
       }
       setState(() {
         loading = false;
@@ -79,7 +79,7 @@ class _PlantDetailsScreenState extends State<PlantDetailsScreen> {
                   elevation: 0,
                   child: GridView.count(
                     shrinkWrap: true,
-                    crossAxisCount: 3,
+                    crossAxisCount: 5,
                     mainAxisSpacing: 5.0,
                     crossAxisSpacing: 5.0,
                     children: [
@@ -245,7 +245,7 @@ class _PlantDetailsScreenState extends State<PlantDetailsScreen> {
                                     for (final link
                                         in plant!.otherResourcesLinks!)
                                       TextSpan(
-                                        text: link + "\n",
+                                        text: "$link\n",
                                         style: const TextStyle(
                                           color: Colors.blue,
                                           decoration: TextDecoration.underline,

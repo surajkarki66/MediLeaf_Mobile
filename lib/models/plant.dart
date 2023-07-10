@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 Plant plantFromJson(String str) => Plant.fromJson(json.decode(str));
+List<Plant> plantsFromJson(List data) =>
+    List<Plant>.from(data.map((x) => Plant.fromJson(x)));
 
 String plantToJson(Plant data) => json.encode(data.toJson());
 
@@ -8,15 +10,15 @@ class Plant {
   int id;
   List<String> commonNames;
   List<String> commonNamesNe;
-  String description;
-  String descriptionNe;
-  String medicinalProperties;
-  String medicinalPropertiesNe;
-  String duration;
-  String growthHabit;
+  String? description;
+  String? descriptionNe;
+  String? medicinalProperties;
+  String? medicinalPropertiesNe;
+  String? duration;
+  String? growthHabit;
   String? wikipediaLink;
-  List<dynamic>? otherResourcesLinks;
-  int noOfObservations;
+  List<String>? otherResourcesLinks;
+  int? noOfObservations;
   String family;
   String genus;
   String? species;
@@ -28,18 +30,18 @@ class Plant {
     required this.id,
     required this.commonNames,
     required this.commonNamesNe,
-    required this.description,
-    required this.descriptionNe,
-    required this.medicinalProperties,
-    required this.medicinalPropertiesNe,
-    required this.duration,
-    required this.growthHabit,
-    required this.wikipediaLink,
-    required this.otherResourcesLinks,
+    this.description,
+    this.descriptionNe,
+    this.medicinalProperties,
+    this.medicinalPropertiesNe,
+    this.duration,
+    this.growthHabit,
+    this.wikipediaLink,
+    this.otherResourcesLinks,
     required this.noOfObservations,
     required this.family,
     required this.genus,
-    required this.species,
+    this.species,
     required this.images,
     required this.createdAt,
     required this.updatedAt,
@@ -55,9 +57,10 @@ class Plant {
         medicinalPropertiesNe: json["medicinal_properties_ne"],
         duration: json["duration"],
         growthHabit: json["growth_habit"],
-        wikipediaLink: json["wikipedia_link"],
-        otherResourcesLinks:
-            List<dynamic>.from(json["other_resources_links"].map((x) => x)),
+        wikipediaLink: json["wikipedia_link"] as String?, // Allow null value
+        otherResourcesLinks: json["other_resources_links"] != null
+            ? List<String>.from(json["other_resources_links"].map((x) => x))
+            : null,
         noOfObservations: json["no_of_observations"],
         family: json["family"],
         genus: json["genus"],

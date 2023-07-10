@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:medileaf/utils/base_client.dart';
 import 'package:medileaf/models/plant.dart';
 
 class RemoteService {
-  Future<Plant> getPlantDetails(String genus, String? species) async {
+  Future<Plant> getPlantDetailsByScientificName(
+      String genus, String? species) async {
     try {
       final client = BaseClient();
       var url = "";
@@ -22,17 +25,18 @@ class RemoteService {
     }
   }
 
-  // Future<List<Plant>> getPlants(String searchQuery, dynamic pageParams) async {
-  //   try {
-  //     final client = BaseClient();
-  //     var url =
-  //         'https://medi-leaf-backend.vercel.app/api/v1/plants/?search=$searchQuery&limit=${pageParams.limit}&offset=${pageParams.offset}';
+  Future<List<Plant>> getPlants(String searchQuery,
+      {required limit, required offset}) async {
+    try {
+      final client = BaseClient();
+      var url =
+          'https://medi-leaf-backend.vercel.app/api/v1/plants/?search=$searchQuery&limit=$limit&offset=$offset';
 
-  //     final responseJson = await client.get(url);
-
-  //     return plantFromJson(responseJson);
-  //   } catch (error) {
-  //     rethrow;
-  //   }
-  // }
+      final responseJson = await client.get(url);
+      final plants = json.decode(responseJson)["results"];
+      return plantsFromJson(plants);
+    } catch (error) {
+      rethrow;
+    }
+  }
 }

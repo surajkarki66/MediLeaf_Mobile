@@ -113,7 +113,7 @@ class _SpeciesScreenState extends State<SpeciesScreen> {
                         },
                       ),
                     ),
-                    onChanged: (value) {
+                    onSubmitted: (value) {
                       onSearchTextChanged(value);
                     },
                   ),

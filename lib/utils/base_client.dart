@@ -1,7 +1,9 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:async';
 
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+import 'package:requests/requests.dart';
 
 import 'package:medileaf/business_logic/exceptions/exception_handlers.dart';
 
@@ -9,11 +11,11 @@ class BaseClient {
   static const int timeOutDuration = 35;
 
   //GET
-  Future<dynamic> get(String url) async {
-    var uri = Uri.parse(url);
+  Future<dynamic> get(String url, Map<String, String>? headers) async {
     try {
-      var response =
-          await http.get(uri).timeout(const Duration(seconds: timeOutDuration));
+      Response response =
+          await Requests.get(url, headers: headers, withCredentials: true)
+              .timeout(const Duration(seconds: timeOutDuration));
       return _processResponse(response);
     } catch (e) {
       throw ExceptionHandlers().getExceptionString(e);
@@ -21,12 +23,12 @@ class BaseClient {
   }
 
   //POST
-  Future<dynamic> post(String url, dynamic payloadObj) async {
-    var uri = Uri.parse(url);
-    var payload = jsonEncode(payloadObj);
+  Future<dynamic> post(String url, dynamic payload) async {
     try {
-      var response = await http
-          .post(uri, body: payload)
+      Response response = await Requests.post(url,
+              body: payload,
+              withCredentials: true,
+              bodyEncoding: RequestBodyEncoding.FormURLEncoded)
           .timeout(const Duration(seconds: timeOutDuration));
 
       return _processResponse(response);
@@ -40,19 +42,18 @@ class BaseClient {
 
 //----------------------ERROR STATUS CODES----------------------
 
-  dynamic _processResponse(http.Response response) {
+  dynamic _processResponse(Response response) {
     switch (response.statusCode) {
       case 200:
-        var responseJson = response.body;
-        return responseJson;
+        return {"body": response.body, "headers": response.headers};
       case 400: //Bad request
-        throw BadRequestException(jsonDecode(response.body)['message']);
+        throw BadRequestException(response.json()['message'][0]);
       case 401: //Unauthorized
-        throw UnAuthorizedException(jsonDecode(response.body)['message']);
+        throw UnAuthorizedException(response.json()['details']);
       case 403: //Forbidden
-        throw UnAuthorizedException(jsonDecode(response.body)['message']);
+        throw UnAuthorizedException(response.json()['details']);
       case 404: //Resource Not Found
-        throw NotFoundException(jsonDecode(response.body)['message']);
+        throw NotFoundException(response.json()['message'][0]);
       case 500: //Internal Server Error
       default:
         throw FetchDataException(

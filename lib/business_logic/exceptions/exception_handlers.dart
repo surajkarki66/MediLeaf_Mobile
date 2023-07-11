@@ -6,11 +6,11 @@ class ExceptionHandlers {
     if (error is SocketException) {
       return 'No internet connection.';
     } else if (error is HttpException) {
-      return 'HTTP error occured.';
+      return 'HTTP error occurred.';
     } else if (error is FormatException) {
       return 'Invalid data format.';
     } else if (error is TimeoutException) {
-      return 'Request timedout.';
+      return 'Request timeout.';
     } else if (error is BadRequestException) {
       return error.message.toString();
     } else if (error is UnAuthorizedException) {
@@ -20,7 +20,7 @@ class ExceptionHandlers {
     } else if (error is FetchDataException) {
       return error.message.toString();
     } else {
-      return 'Unknown error occured.';
+      return 'Unknown error occurred.';
     }
   }
 }

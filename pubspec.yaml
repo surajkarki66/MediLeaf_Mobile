@@ -35,17 +35,21 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  google_fonts: ^5.1.0
+  google_fonts: 
   url_launcher: ^6.1.11
   flutter_tflite: ^1.0.1
   image_picker: 
   connectivity_plus: ^4.0.1
   provider: ^6.0.1
-  http: ^1.1.0
+  http:
   modal_progress_hud_nsn: ^0.4.0
   mime: ^1.0.4
   http_parser: ^4.0.2
   flutter_html: ^3.0.0-beta.2
+  wc_form_validators: ^1.0.0
+  shared_preferences: ^2.2.0
+  requests: ^4.7.0
+  font_awesome_flutter:
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +78,8 @@ flutter:
     - assets/images/logo.png
     - assets/model/model.tflite
     - assets/model/labels.txt
+    - assets/images/login.png
+    - assets/images/user.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

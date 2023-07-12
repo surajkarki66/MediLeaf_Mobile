@@ -23,7 +23,8 @@ class BaseClient {
   }
 
   //POST
-  Future<dynamic> post(String url, dynamic payload) async {
+  Future<dynamic> post(String url, dynamic payload,
+      {Map<String, String>? headers}) async {
     try {
       Response response = await Requests.post(url,
               body: payload,
@@ -44,10 +45,20 @@ class BaseClient {
 
   dynamic _processResponse(Response response) {
     switch (response.statusCode) {
-      case 200:
+      case 200 || 201:
         return {"body": response.body, "headers": response.headers};
       case 400: //Bad request
-        throw BadRequestException(response.json()['message'][0]);
+        dynamic responseBody = response.json();
+        dynamic errorMessage;
+        if (responseBody.containsKey('message')) {
+          final errorMessages = (responseBody.values.toList());
+
+          errorMessage = errorMessages[0];
+        } else {
+          final errors = responseBody.values.toList();
+          errorMessage = errors[0];
+        }
+        throw BadRequestException(errorMessage[0]);
       case 401: //Unauthorized
         throw UnAuthorizedException(response.json()['details']);
       case 403: //Forbidden

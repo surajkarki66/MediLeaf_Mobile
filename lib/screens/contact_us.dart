@@ -66,9 +66,9 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                             labelText: 'Last Name',
                           ),
                           validator: Validators.compose([
-                            Validators.required('First name is required'),
+                            Validators.required('Last name is required'),
                             Validators.min(
-                                2, 'First name must be at least 2 characters'),
+                                2, 'Last name must be at least 2 characters'),
                           ]),
                         ),
                         const SizedBox(

@@ -5,6 +5,7 @@ import 'package:medileaf/screens/home.dart';
 import 'package:medileaf/screens/identification.dart';
 import 'package:medileaf/screens/profile.dart';
 import 'package:medileaf/screens/species.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
@@ -17,11 +18,32 @@ class TabsScreen extends StatefulWidget {
 
 class _TabsScreenState extends State<TabsScreen> {
   int _selectedPageIndex = 0;
+  bool? isAuth;
 
   void _selectPage(int index) {
     setState(() {
       _selectedPageIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkAuth();
+  }
+
+  checkAuth() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final sessionId = prefs.getString("sessionId");
+    if (sessionId == null) {
+      setState(() {
+        isAuth = false;
+      });
+    } else {
+      setState(() {
+        isAuth = true;
+      });
+    }
   }
 
   @override
@@ -57,6 +79,9 @@ class _TabsScreenState extends State<TabsScreen> {
         size: 40,
       );
     }
+    goToHome() {
+      _selectPage(0);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -64,6 +89,43 @@ class _TabsScreenState extends State<TabsScreen> {
         backgroundColor: const Color.fromRGBO(30, 156, 93, 1),
         leading: leadingWidget,
         titleSpacing: 5,
+        actions: _selectedPageIndex == 4
+            ? isAuth != null
+                ? isAuth!
+                    ? [
+                        PopupMenuButton<String>(
+                          onSelected: (value) async {
+                            if (value == 'logout') {
+                              final SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              prefs.remove("sessionId");
+                              setState(() {
+                                isAuth = false;
+                              });
+                              goToHome();
+                            } else if (value == 'settings') {}
+                          },
+                          itemBuilder: (BuildContext context) => [
+                            const PopupMenuItem<String>(
+                              value: 'logout',
+                              child: ListTile(
+                                leading: Icon(Icons.logout),
+                                title: Text('Logout'),
+                              ),
+                            ),
+                            const PopupMenuItem<String>(
+                              value: 'settings',
+                              child: ListTile(
+                                leading: Icon(Icons.settings),
+                                title: Text('Settings'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ]
+                    : []
+                : []
+            : [],
       ),
       body: activePage,
       bottomNavigationBar: BottomNavigationBar(

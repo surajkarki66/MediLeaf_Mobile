@@ -76,14 +76,23 @@ class RemoteService {
     }
   }
 
-  Future<dynamic> checkAuth() async {
+  Future<dynamic> register(String firstName, String lastName, String email,
+      String password, String country, String phoneNumber) async {
     try {
       final client = BaseClient();
-      const url = 'https://medi-leaf-backend.vercel.app/api/v1/me/';
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final headers = {'Cookie': 'sessionid=${prefs.get("sessionId")}'};
+      var url = 'https://medi-leaf-backend.vercel.app/api/v1/signup/';
 
-      final response = await client.get(url, headers);
+      Map<String, dynamic> payLoad = {
+        "email": email,
+        "password": password,
+        "confirm_password": password,
+        "first_name": firstName,
+        "last_name": lastName,
+        "country": country,
+        "contact": phoneNumber,
+      };
+
+      final response = await client.post(url, payLoad);
 
       return jsonDecode(response["body"]);
     } catch (error) {

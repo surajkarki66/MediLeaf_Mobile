@@ -50,6 +50,7 @@ dependencies:
   shared_preferences: ^2.2.0
   requests: ^4.7.0
   font_awesome_flutter:
+  csc_picker: ^0.2.6
 
 dev_dependencies:
   flutter_test:

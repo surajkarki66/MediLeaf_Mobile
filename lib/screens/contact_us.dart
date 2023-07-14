@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:medileaf/app_state.dart';
 import 'package:medileaf/services/remote_service.dart';
 import 'package:provider/provider.dart';
@@ -20,22 +19,26 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   TextEditingController subject = TextEditingController();
   TextEditingController message = TextEditingController();
 
-  sendMessage(String firstName, String lastName, String email, String subject,
-      String message) async {
+  sendMessage(
+      String fname, String lname, String em, String sub, String msg) async {
     setState(() {
       loading = true;
     });
     try {
-      final result = await RemoteService()
-          .sendMessage(firstName, lastName, email, subject, message);
-
+      final result =
+          await RemoteService().sendMessage(fname, lname, em, sub, msg);
       showMessage(
           "Thank you! ${result.firstName} for your message, we will get back to you very soon.",
           false);
-
       setState(() {
         loading = false;
       });
+      _formKey.currentState!.reset();
+      firstName.clear();
+      lastName.clear();
+      email.clear();
+      subject.clear();
+      message.clear();
     } catch (error) {
       showMessage(error.toString(), true);
       setState(() {
@@ -186,14 +189,13 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   if (_formKey.currentState!.validate()) {
-                                    if (!loading) {
-                                      sendMessage(
-                                          firstName.text,
-                                          lastName.text,
-                                          email.text,
-                                          subject.text,
-                                          message.text);
-                                    }
+                                    sendMessage(
+                                      firstName.text,
+                                      lastName.text,
+                                      email.text,
+                                      subject.text,
+                                      message.text,
+                                    );
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(

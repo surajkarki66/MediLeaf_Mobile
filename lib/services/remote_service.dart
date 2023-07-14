@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:medileaf/models/contact_us.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:medileaf/utils/base_client.dart';
@@ -112,6 +113,28 @@ class RemoteService {
 
       final result = jsonDecode(response["body"])["results"];
       return result;
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  Future<ContactUs> sendMessage(String firstName, String lastName, String email,
+      String subject, String message) async {
+    try {
+      final client = BaseClient();
+      var url = 'https://medi-leaf-backend.vercel.app/api/v1/contact_us/';
+
+      Map<String, dynamic> payLoad = {
+        "email": email,
+        "first_name": firstName,
+        "last_name": lastName,
+        "subject": subject,
+        "message": message,
+      };
+
+      final response = await client.post(url, payLoad);
+
+      return contactUsFromJson(response["body"]);
     } catch (error) {
       rethrow;
     }

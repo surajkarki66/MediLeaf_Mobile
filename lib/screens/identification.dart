@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:medileaf/screens/result_screen.dart';
 import 'package:medileaf/widgets/modal.dart';
 
-import 'package:flutter_tflite/flutter_tflite.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,20 +22,10 @@ class _IdentificationScreenState extends State<IdentificationScreen> {
   @override
   void initState() {
     super.initState();
-    loadModel().then((value) {
-      setState(() {});
-    });
-  }
-
-  loadModel() async {
-    modelStatus = (await Tflite.loadModel(
-        model: 'assets/model/model.tflite',
-        labels: 'assets/model/labels.txt'))!;
   }
 
   @override
   void dispose() {
-    Tflite.close();
     super.dispose();
   }
 

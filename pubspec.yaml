@@ -37,7 +37,6 @@ dependencies:
   cupertino_icons: ^1.0.2
   google_fonts: 
   url_launcher: ^6.1.11
-  flutter_tflite: ^1.0.1
   image_picker: 
   connectivity_plus: ^4.0.1
   provider: ^6.0.1
@@ -51,6 +50,7 @@ dependencies:
   requests: ^4.7.0
   font_awesome_flutter:
   csc_picker: ^0.2.6
+  flutter_tflite:
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +81,7 @@ flutter:
     - assets/model/labels.txt
     - assets/images/login.png
     - assets/images/user.png
+    - assets/images/suggestion.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

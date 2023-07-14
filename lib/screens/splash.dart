@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_tflite/flutter_tflite.dart';
+import 'package:medileaf/app_state.dart';
 import 'package:medileaf/screens/tabs.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -10,12 +13,28 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  loadModel(AppState appState) async {
+    final modelStatus = await Tflite.loadModel(
+        model: "assets/model/model.tflite",
+        labels: "assets/model/labels.txt",
+        numThreads: 1,
+        isAsset: true,
+        useGpuDelegate: false);
+    appState.modelStatus = modelStatus!;
+  }
+
   @override
   void initState() {
     super.initState();
+    // final appState = Provider.of<AppState>(context, listen: false);
+    // loadModel(appState);
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const TabsScreen()));
+        context,
+        MaterialPageRoute(
+          builder: (context) => const TabsScreen(),
+        ),
+      );
     });
   }
 

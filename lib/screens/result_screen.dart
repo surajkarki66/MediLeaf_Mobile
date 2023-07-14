@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:medileaf/screens/feedback.dart';
 import 'package:mime/mime.dart';
 import 'package:flutter/material.dart';
 import 'package:medileaf/app_state.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:medileaf/widgets/plant_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 typedef DetectImage = dynamic Function(ConnectivityStatus connectivityStatus);
 
@@ -77,6 +79,33 @@ class _ResultScreenState extends State<ResultScreen> {
         _error = error.toString();
       });
     }
+  }
+
+  void showMessage(String message, bool isError) {
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16.0,
+        ),
+      ),
+      backgroundColor: isError ? Colors.red : Colors.green,
+      duration: const Duration(seconds: 3),
+      behavior: SnackBarBehavior.floating,
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  goToFeedback() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => FeedbackScreen(
+          image: widget.image,
+        ),
+      ),
+    );
   }
 
   @override
@@ -167,7 +196,32 @@ class _ResultScreenState extends State<ResultScreen> {
             ),
           if (_output.isNotEmpty)
             TextButton(
-                onPressed: () {},
+                onPressed: () async {
+                  final SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  final isVerified = prefs.getBool("isVerified");
+                  final sessionId = prefs.getString("sessionId");
+
+                  if (sessionId == null) {
+                    showMessage("Please login first!", true);
+                    return;
+                  }
+                  if (isVerified != null) {
+                    if (!isVerified) {
+                      showMessage("Please first verify your account!", true);
+                      return;
+                    }
+                  }
+                  if (widget.connectivityStatus !=
+                      ConnectivityStatus.connected) {
+                    showMessage(
+                        "Sorry! you are unable to give suggestion in offline mode",
+                        true);
+                    return;
+                  } else {
+                    goToFeedback();
+                  }
+                },
                 child: const Text(
                   "Suggest",
                   style: TextStyle(

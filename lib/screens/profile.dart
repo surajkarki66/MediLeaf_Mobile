@@ -51,6 +51,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   getProfile() async {
     try {
       final result = await RemoteService().getProfile();
+      final isVerified = result["is_verified"];
+      final userId = result["id"];
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool("isVerified", isVerified);
+      prefs.setInt("userId", userId);
 
       setState(() {
         user = result;

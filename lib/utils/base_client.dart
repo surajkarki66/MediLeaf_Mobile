@@ -26,14 +26,17 @@ class BaseClient {
   Future<dynamic> post(String url, dynamic payload,
       {Map<String, String>? headers}) async {
     try {
+      print(headers);
       Response response = await Requests.post(url,
               body: payload,
               withCredentials: true,
+              headers: headers,
               bodyEncoding: RequestBodyEncoding.FormURLEncoded)
           .timeout(const Duration(seconds: timeOutDuration));
-
+      print(response.body);
       return _processResponse(response);
     } catch (e) {
+      print(e);
       throw ExceptionHandlers().getExceptionString(e);
     }
   }

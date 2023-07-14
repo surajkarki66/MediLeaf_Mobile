@@ -6,6 +6,14 @@ enum ConnectivityStatus { connected, disconnected }
 
 class AppState with ChangeNotifier {
   ConnectivityStatus _connectivityStatus = ConnectivityStatus.disconnected;
+  String? _modelStatus;
+
+  String get modelStatus => _modelStatus!;
+
+  set modelStatus(String status) {
+    _modelStatus = status;
+    notifyListeners();
+  }
 
   AppState() {
     initConnectivity();

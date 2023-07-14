@@ -59,9 +59,9 @@ class _SpeciesScreenState extends State<SpeciesScreen> {
 
   @override
   void dispose() {
+    super.dispose();
     _scrollController.dispose();
     _searchController.dispose();
-    super.dispose();
   }
 
   void onSearchTextChanged(String newText) {

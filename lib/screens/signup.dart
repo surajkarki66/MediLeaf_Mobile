@@ -35,8 +35,8 @@ class _SignupStateScreen extends State<SignupScreen> {
       loading = true;
     });
     try {
-      final result = await RemoteService()
-          .register(firstName, lastName, email, password, country, phoneNumber);
+      final result = await RemoteService().register(firstName, lastName, email,
+          password, country.replaceAll(' ', ''), phoneNumber);
       showMessage(result["message"], false);
       setState(() {
         loading = false;

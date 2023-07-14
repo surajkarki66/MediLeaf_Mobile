@@ -99,6 +99,8 @@ class _TabsScreenState extends State<TabsScreen> {
                               final SharedPreferences prefs =
                                   await SharedPreferences.getInstance();
                               prefs.remove("sessionId");
+                              prefs.remove("userId");
+                              prefs.remove("isVerified");
                               setState(() {
                                 isAuth = false;
                               });

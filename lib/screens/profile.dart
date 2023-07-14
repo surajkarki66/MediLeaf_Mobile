@@ -1,5 +1,10 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:medileaf/app_state.dart';
 import 'package:medileaf/screens/login.dart';
 import 'package:medileaf/services/remote_service.dart';
@@ -16,9 +21,11 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool loading = true;
+  bool imageLoading = false;
   dynamic user;
   String? _error;
   bool? isAuthenticated;
+  dynamic avatar;
   @override
   void initState() {
     super.initState();
@@ -66,6 +73,122 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _error = e.toString();
         loading = false;
       });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take a picture'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _getImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from gallery'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _getImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _getImage(ImageSource source) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      XFile? image = (await picker.pickImage(source: source));
+      if (image != null) {
+        setState(() {
+          imageLoading = true;
+        });
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        final sessionId = prefs.getString("sessionId");
+
+        if (user != null) {
+          Response response = user["profile"] != null
+              ? await _updateUserAvatar(
+                  sessionId, image, user["profile"]["slug"])
+              : await _updateUserAvatar(sessionId, image, null);
+
+          if (response.statusCode == 201) {
+            final result = jsonDecode(response.body);
+
+            if (result != null) {
+              setState(() {
+                avatar = result["avatar"];
+                imageLoading = false;
+              });
+            }
+
+            showMessage("Successfully! avatar changed", false);
+          }
+          if (response.statusCode == 403) {
+            final result = jsonDecode(response.body);
+            setState(() {
+              imageLoading = false;
+            });
+            final errorMessage = result["message"];
+            showMessage(errorMessage, true);
+          }
+          if (response.statusCode == 400) {
+            final result = jsonDecode(response.body);
+
+            setState(() {
+              imageLoading = false;
+            });
+            final errorMessage = result["message"]["avatar"][0];
+            showMessage(errorMessage, true);
+          }
+        }
+      }
+    } catch (e) {
+      setState(() {
+        imageLoading = false;
+      });
+      showMessage(e.toString(), true);
+    }
+  }
+
+  Future<Response> _updateUserAvatar(
+      dynamic sessionId, XFile? avatarImage, String? profileSlug) async {
+    late final Uri apiUrl;
+    late final http.MultipartRequest request;
+    if (profileSlug != null) {
+      apiUrl = Uri.parse(
+          'https://medi-leaf-backend.vercel.app/api/v1/profile/$profileSlug/');
+      request = http.MultipartRequest('PATCH', apiUrl);
+    } else {
+      apiUrl =
+          Uri.parse('https://medi-leaf-backend.vercel.app/api/v1/profile/');
+      request = http.MultipartRequest('POST', apiUrl);
+    }
+
+    try {
+      final headers = {'Cookie': 'sessionid=$sessionId'};
+
+      final image =
+          await http.MultipartFile.fromPath('avatar', avatarImage!.path);
+
+      request.headers.addAll(headers);
+      request.files.add(image);
+
+      final myRequest = await request.send();
+      http.Response res = await http.Response.fromStream(myRequest);
+      return res;
+    } catch (e) {
+      rethrow;
     }
   }
 
@@ -121,15 +244,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     children: [
                       user["profile"] != null
-                          ? CircleAvatar(
-                              radius: 60.0,
-                              backgroundImage:
-                                  NetworkImage(user!["profile"]!["avatar"]),
+                          ? Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: _pickImage,
+                                  child: CircleAvatar(
+                                    radius: 60.0,
+                                    backgroundImage: avatar == null
+                                        ? NetworkImage(
+                                            user!["profile"]!["avatar"])
+                                        : NetworkImage(avatar),
+                                  ),
+                                ),
+                                if (imageLoading)
+                                  const CircularProgressIndicator(
+                                    color: Color.fromRGBO(30, 156, 93, 1),
+                                  ),
+                              ],
                             )
-                          : const CircleAvatar(
-                              radius: 60.0,
-                              backgroundImage:
-                                  AssetImage('assets/images/user.png'),
+                          : Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: _pickImage,
+                                  child: CircleAvatar(
+                                    radius: 60.0,
+                                    backgroundImage: avatar == null
+                                        ? const NetworkImage(
+                                            "https://res.cloudinary.com/deek0shwx/image/upload/f_auto,q_auto/v1/media/avatars/toufvunmplvpjmoak8it")
+                                        : NetworkImage(avatar),
+                                  ),
+                                ),
+                                if (imageLoading)
+                                  const CircularProgressIndicator(
+                                    color: Color.fromRGBO(30, 156, 93, 1),
+                                  ),
+                              ],
                             ),
                       const SizedBox(height: 16.0),
                       Row(

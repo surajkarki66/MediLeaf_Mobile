@@ -11,12 +11,13 @@ class Modal extends StatelessWidget {
   final VoidCallback onClose;
   final ShowResult showResult;
 
-  const Modal(
-      {super.key,
-      required this.onClose,
-      required this.image,
-      required this.showResult,
-      required this.connectivityStatus});
+  const Modal({
+    super.key,
+    required this.onClose,
+    required this.image,
+    required this.showResult,
+    required this.connectivityStatus,
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:medileaf/utils/process_image.dart';
 import 'package:medileaf/screens/feedback.dart';
 import 'package:mime/mime.dart';
 import 'package:flutter/material.dart';
@@ -11,10 +12,13 @@ import 'package:medileaf/widgets/plant_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 typedef DetectImage = dynamic Function(ConnectivityStatus connectivityStatus);
+typedef RunInference = Future<List<Map<String, dynamic>>> Function(
+    List<List<List<num>>> imageMatrix);
 
 class ResultScreen extends StatefulWidget {
   final File image;
   final ConnectivityStatus connectivityStatus;
+  final RunInference runInference;
 
   @override
   State<ResultScreen> createState() => _ResultScreenState();
@@ -22,21 +26,22 @@ class ResultScreen extends StatefulWidget {
     Key? key,
     required this.image,
     required this.connectivityStatus,
+    required this.runInference,
   }) : super(key: key);
 }
 
 class _ResultScreenState extends State<ResultScreen> {
   List _output = [];
   String _error = "";
-  bool _loading = true;
+  bool _loading = false;
   final String url = "http://127.0.0.1:3001/classify";
 
   detectImage(ConnectivityStatus connectivityStatus) async {
     try {
       if (connectivityStatus == ConnectivityStatus.connected) {
-        await upload(widget.image);
+        await uploadOnline(widget.image);
       } else {
-        // Tflite model
+        await uploadOffline(widget.image);
       }
     } catch (error) {
       setState(() {
@@ -46,7 +51,7 @@ class _ResultScreenState extends State<ResultScreen> {
     }
   }
 
-  upload(File image) async {
+  uploadOnline(File image) async {
     try {
       final request = http.MultipartRequest("POST", Uri.parse(url));
       final header = {"Content_type": "multipart/form-data"};
@@ -73,6 +78,22 @@ class _ResultScreenState extends State<ResultScreen> {
           _output = resJson;
         });
       }
+    } catch (error) {
+      setState(() {
+        _loading = false;
+        _error = error.toString();
+      });
+    }
+  }
+
+  uploadOffline(File image) async {
+    try {
+      final imageMatrix = processImage(image.readAsBytesSync());
+      final result = await widget.runInference(imageMatrix);
+      setState(() {
+        _loading = false;
+        _output = result;
+      });
     } catch (error) {
       setState(() {
         _loading = false;

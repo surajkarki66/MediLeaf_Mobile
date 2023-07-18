@@ -53,29 +53,37 @@ class _ResultScreenState extends State<ResultScreen> {
 
   uploadOnline(File image) async {
     try {
-      final request = http.MultipartRequest("POST", Uri.parse(url));
-      final header = {"Content_type": "multipart/form-data"};
-      final mimeType = lookupMimeType(image.path);
+      bool isLeaf = await checkLeaf(image);
+      if (isLeaf) {
+        final request = http.MultipartRequest("POST", Uri.parse(url));
+        final header = {"Content_type": "multipart/form-data"};
+        final mimeType = lookupMimeType(image.path);
 
-      request.files.add(await http.MultipartFile.fromPath(
-          "image_field", image.path,
-          filename: image.path.split('/').last,
-          contentType: MediaType.parse(mimeType!)));
-      request.headers.addAll(header);
-      final myRequest = await request.send();
-      http.Response res = await http.Response.fromStream(myRequest);
+        request.files.add(await http.MultipartFile.fromPath(
+            "image_field", image.path,
+            filename: image.path.split('/').last,
+            contentType: MediaType.parse(mimeType!)));
+        request.headers.addAll(header);
+        final myRequest = await request.send();
+        http.Response res = await http.Response.fromStream(myRequest);
 
-      final resJson = jsonDecode(res.body);
+        final resJson = jsonDecode(res.body);
 
-      if (myRequest.statusCode == 200) {
-        setState(() {
-          _loading = false;
-          _output = resJson;
-        });
+        if (res.statusCode == 200) {
+          setState(() {
+            _loading = false;
+            _output = resJson;
+          });
+        } else {
+          setState(() {
+            _loading = false;
+            _output = resJson;
+          });
+        }
       } else {
         setState(() {
           _loading = false;
-          _output = resJson;
+          _error = "No leaf is found in the image.";
         });
       }
     } catch (error) {
@@ -83,6 +91,34 @@ class _ResultScreenState extends State<ResultScreen> {
         _loading = false;
         _error = error.toString();
       });
+    }
+  }
+
+  Future<bool> checkLeaf(File image) async {
+    try {
+      final request = http.MultipartRequest(
+          "POST",
+          Uri.parse(
+              'https://my-api.plantnet.org/v2/identify/all?include-related-images=false&no-reject=false&lang=en&api-key=2b10iUtDXGopIcYTsLK2r1QK'));
+      final header = {"Content_type": "multipart/form-data"};
+      final mimeType = lookupMimeType(image.path);
+
+      request.files.add(await http.MultipartFile.fromPath("images", image.path,
+          filename: image.path.split('/').last,
+          contentType: MediaType.parse(mimeType!)));
+      request.headers.addAll(header);
+      request.fields['organs'] = 'leaf';
+
+      final myRequest = await request.send();
+      http.Response res = await http.Response.fromStream(myRequest);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      rethrow;
     }
   }
 

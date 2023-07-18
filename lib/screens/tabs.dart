@@ -46,6 +46,23 @@ class _TabsScreenState extends State<TabsScreen> {
     }
   }
 
+  void showMessage(String message, bool isError) {
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16.0,
+        ),
+      ),
+      backgroundColor: isError ? Colors.red : Colors.green,
+      duration: const Duration(seconds: 5),
+      behavior: SnackBarBehavior.floating,
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget activePage = HomeScreen(
@@ -105,7 +122,7 @@ class _TabsScreenState extends State<TabsScreen> {
                                 isAuth = false;
                               });
                               goToHome();
-                            } else if (value == 'settings') {}
+                            }
                           },
                           itemBuilder: (BuildContext context) => [
                             const PopupMenuItem<String>(
@@ -113,13 +130,6 @@ class _TabsScreenState extends State<TabsScreen> {
                               child: ListTile(
                                 leading: Icon(Icons.logout),
                                 title: Text('Logout'),
-                              ),
-                            ),
-                            const PopupMenuItem<String>(
-                              value: 'settings',
-                              child: ListTile(
-                                leading: Icon(Icons.settings),
-                                title: Text('Settings'),
                               ),
                             ),
                           ],
@@ -138,15 +148,26 @@ class _TabsScreenState extends State<TabsScreen> {
         selectedFontSize: 12,
         selectedItemColor: const Color.fromRGBO(30, 156, 93, 1),
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.format_list_bulleted), label: "Species"),
+            icon: Icon(Icons.home),
+            label: "Home",
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.photo_camera), label: "Identification"),
+            icon: Icon(Icons.format_list_bulleted),
+            label: "Species",
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.groups), label: "Contact us"),
+            icon: Icon(Icons.photo_camera),
+            label: "Identification",
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle), label: "Profile")
+            icon: Icon(Icons.groups),
+            label: "Contact us",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: "Profile",
+          ),
         ],
       ),
     );

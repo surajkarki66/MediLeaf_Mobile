@@ -188,6 +188,16 @@ class _IdentificationScreenState extends State<IdentificationScreen> {
                   fontWeight: FontWeight.w700,
                   color: Colors.black,
                 ),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                '(Leaf Image Only)',
+                style: GoogleFonts.lato(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: const Color.fromRGBO(30, 156, 93, 1),
+                    fontStyle: FontStyle.italic),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 15),
               Column(

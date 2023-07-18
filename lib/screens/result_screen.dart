@@ -33,7 +33,7 @@ class ResultScreen extends StatefulWidget {
 class _ResultScreenState extends State<ResultScreen> {
   List _output = [];
   String _error = "";
-  bool _loading = false;
+  bool _loading = true;
   final String url = "http://127.0.0.1:3001/classify";
 
   detectImage(ConnectivityStatus connectivityStatus) async {

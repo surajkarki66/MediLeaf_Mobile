@@ -134,6 +134,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             showMessage("Successfully! avatar changed", false);
           }
+          if (response.statusCode == 200) {
+            final result = jsonDecode(response.body);
+
+            if (result != null) {
+              setState(() {
+                avatar = result["avatar"];
+                imageLoading = false;
+              });
+            }
+
+            showMessage("Successfully! avatar changed", false);
+          }
           if (response.statusCode == 403) {
             final result = jsonDecode(response.body);
             setState(() {
@@ -151,6 +163,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             final errorMessage = result["message"]["avatar"][0];
             showMessage(errorMessage, true);
           }
+        } else {
+          setState(() {
+            imageLoading = false;
+          });
         }
       }
     } catch (e) {
@@ -174,7 +190,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Uri.parse('https://medi-leaf-backend.vercel.app/api/v1/profile/');
       request = http.MultipartRequest('POST', apiUrl);
     }
-
     try {
       final headers = {'Cookie': 'sessionid=$sessionId'};
 
@@ -186,6 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       final myRequest = await request.send();
       http.Response res = await http.Response.fromStream(myRequest);
+
       return res;
     } catch (e) {
       rethrow;

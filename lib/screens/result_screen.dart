@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
+import "package:medileaf/config/config.dart";
 import 'package:medileaf/utils/process_image.dart';
 import 'package:medileaf/screens/feedback.dart';
 import 'package:mime/mime.dart';
@@ -34,7 +35,7 @@ class _ResultScreenState extends State<ResultScreen> {
   List _output = [];
   String _error = "";
   bool _loading = true;
-  final String url = "http://127.0.0.1:8080/api/v1/classify/";
+  final String url = "$aiBaseUrl/api/v1/classify/";
 
   detectImage(ConnectivityStatus connectivityStatus) async {
     try {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import "package:medileaf/config/config.dart";
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,7 +31,7 @@ class _FeedbackStateScreen extends State<FeedbackScreen> {
   Future<dynamic> sendFeedback(
       Map<String, dynamic> data, dynamic sessionId, dynamic csrfToken) async {
     try {
-      var url = 'http://localhost:8000/api/v1/contact/feedback/';
+      var url = '$kbBaseUrl/api/v1/contact/feedback/';
       final headers = {
         'Cookie': 'sessionid=$sessionId;csrftoken=$csrfToken',
         'X-CSRFToken': '$csrfToken'

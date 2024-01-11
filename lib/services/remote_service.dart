@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:medileaf/utils/base_client.dart';
 import 'package:medileaf/models/plant.dart';
+import "package:medileaf/config/config.dart";
 
 class RemoteService {
   Future<Plant> getPlantDetailsByScientificName(
@@ -12,10 +13,9 @@ class RemoteService {
       final client = BaseClient();
       var url = "";
       if (species == null) {
-        url = 'http://localhost:8000/api/v1/plant/details/?genus=$genus';
+        url = '$kbBaseUrl/api/v1/plant/details/?genus=$genus';
       } else {
-        url =
-            'http://localhost:8000/api/v1/plant/details/?genus=$genus&species=$species';
+        url = '$kbBaseUrl/api/v1/plant/details/?genus=$genus&species=$species';
       }
 
       final responseJson = await client.get(url, null);
@@ -29,7 +29,7 @@ class RemoteService {
   Future<String> getCSRF() async {
     try {
       final client = BaseClient();
-      const url = "http://localhost:8000/api/v1/csrf/";
+      final url = '$kbBaseUrl/api/v1/csrf/';
       final responseJson = await client.get(url, null);
       final headers = responseJson["headers"];
       String csrfToken = parseCsrfTokenFromCookie(headers['set-cookie']);
@@ -57,7 +57,7 @@ class RemoteService {
     try {
       final client = BaseClient();
       var url =
-          'http://localhost:8000/api/v1/plants/?search=$searchQuery&limit=$limit&offset=$offset';
+          '$kbBaseUrl/api/v1/plants/?search=$searchQuery&limit=$limit&offset=$offset';
 
       final responseJson = await client.get(url, null);
       final plants = json.decode(responseJson["body"])["results"];
@@ -71,7 +71,7 @@ class RemoteService {
     try {
       final client = BaseClient();
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      var url = 'http://localhost:8000/api/v1/login/';
+      var url = '$kbBaseUrl/api/v1/login/';
       final headers = {
         'Cookie': 'csrftoken=${prefs.get("csrfToken1")}',
         'X-CSRFToken': '${prefs.get("csrfToken1")}'
@@ -109,7 +109,7 @@ class RemoteService {
       String password, String country, String phoneNumber) async {
     try {
       final client = BaseClient();
-      var url = 'http://localhost:8000/api/v1/signup/';
+      var url = '$kbBaseUrl/api/v1/signup/';
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final headers = {
         'Cookie': 'csrftoken=${prefs.get("csrfToken1")}',
@@ -140,7 +140,7 @@ class RemoteService {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final headers = {'Cookie': 'sessionid=${prefs.get("sessionId")}'};
 
-      var url = "http://localhost:8000/api/v1/user-profile/";
+      var url = "$kbBaseUrl/api/v1/user-profile/";
 
       final response = await client.get(url, headers);
 
@@ -155,7 +155,7 @@ class RemoteService {
       String subject, String message) async {
     try {
       final client = BaseClient();
-      var url = 'http://localhost:8000/api/v1/contact_us/';
+      var url = '$kbBaseUrl/api/v1/contact_us/';
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final headers = {
         'Cookie': 'csrftoken=${prefs.get("csrfToken1")}',

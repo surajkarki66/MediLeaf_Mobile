@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import "package:medileaf/config/config.dart";
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -183,10 +184,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     late final Uri apiUrl;
     late final http.MultipartRequest request;
     if (profileSlug != null) {
-      apiUrl = Uri.parse('http://localhost:8000/api/v1/profile/$profileSlug/');
+      apiUrl = Uri.parse('$kbBaseUrl/api/v1/profile/$profileSlug/');
       request = http.MultipartRequest('PATCH', apiUrl);
     } else {
-      apiUrl = Uri.parse('http://localhost:8000/api/v1/profile/');
+      apiUrl = Uri.parse('$kbBaseUrl/api/v1/profile/');
       request = http.MultipartRequest('POST', apiUrl);
     }
     try {

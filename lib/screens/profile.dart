@@ -115,12 +115,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         final sessionId = prefs.getString("sessionId");
+        final csrfToken = prefs.getString("csrfToken");
 
         if (user != null) {
           Response response = user["profile"] != null
               ? await _updateUserAvatar(
-                  sessionId, image, user["profile"]["slug"])
-              : await _updateUserAvatar(sessionId, image, null);
+                  sessionId, csrfToken, image, user["profile"]["slug"])
+              : await _updateUserAvatar(sessionId, csrfToken, image, null);
 
           if (response.statusCode == 201) {
             final result = jsonDecode(response.body);
@@ -177,22 +178,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<Response> _updateUserAvatar(
-      dynamic sessionId, XFile? avatarImage, String? profileSlug) async {
+  Future<Response> _updateUserAvatar(dynamic sessionId, dynamic csrfToken,
+      XFile? avatarImage, String? profileSlug) async {
     late final Uri apiUrl;
     late final http.MultipartRequest request;
     if (profileSlug != null) {
-      apiUrl = Uri.parse(
-          'https://medi-leaf-backend.vercel.app/api/v1/profile/$profileSlug/');
+      apiUrl = Uri.parse('http://localhost:8000/api/v1/profile/$profileSlug/');
       request = http.MultipartRequest('PATCH', apiUrl);
     } else {
-      apiUrl =
-          Uri.parse('https://medi-leaf-backend.vercel.app/api/v1/profile/');
+      apiUrl = Uri.parse('http://localhost:8000/api/v1/profile/');
       request = http.MultipartRequest('POST', apiUrl);
     }
     try {
-      final headers = {'Cookie': 'sessionid=$sessionId'};
-
+      final headers = {
+        'Cookie': 'sessionid=$sessionId;csrftoken=$csrfToken',
+        'X-CSRFToken': '$csrfToken'
+      };
       final image =
           await http.MultipartFile.fromPath('avatar', avatarImage!.path);
 

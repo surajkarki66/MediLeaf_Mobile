@@ -28,10 +28,13 @@ class _FeedbackStateScreen extends State<FeedbackScreen> {
   bool loading = false;
 
   Future<dynamic> sendFeedback(
-      Map<String, dynamic> data, dynamic sessionId) async {
+      Map<String, dynamic> data, dynamic sessionId, dynamic csrfToken) async {
     try {
-      var url = 'https://medi-leaf-backend.vercel.app/api/v1/contact/feedback/';
-      final headers = {'Cookie': 'sessionid=$sessionId'};
+      var url = 'http://localhost:8000/api/v1/contact/feedback/';
+      final headers = {
+        'Cookie': 'sessionid=$sessionId;csrftoken=$csrfToken',
+        'X-CSRFToken': '$csrfToken'
+      };
       final request = http.MultipartRequest('POST', Uri.parse(url));
 
       final image =
@@ -65,6 +68,7 @@ class _FeedbackStateScreen extends State<FeedbackScreen> {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final sessionId = prefs.getString("sessionId");
+      final csrfToken = prefs.getString("csrfToken");
       Map<String, dynamic> payLoad = {
         "common_name": commonName.text,
         "description": description.text,
@@ -75,7 +79,7 @@ class _FeedbackStateScreen extends State<FeedbackScreen> {
         "genus": genus.text,
         "species": species.text,
       };
-      await sendFeedback(payLoad, sessionId);
+      await sendFeedback(payLoad, sessionId, csrfToken);
 
       setState(() {
         loading = false;

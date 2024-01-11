@@ -12,11 +12,10 @@ class RemoteService {
       final client = BaseClient();
       var url = "";
       if (species == null) {
-        url =
-            'https://medi-leaf-backend.vercel.app/api/v1/plant/details/?genus=$genus';
+        url = 'http://localhost:8000/api/v1/plant/details/?genus=$genus';
       } else {
         url =
-            'https://medi-leaf-backend.vercel.app/api/v1/plant/details/?genus=$genus&species=$species';
+            'http://localhost:8000/api/v1/plant/details/?genus=$genus&species=$species';
       }
 
       final responseJson = await client.get(url, null);
@@ -27,12 +26,38 @@ class RemoteService {
     }
   }
 
+  Future<String> getCSRF() async {
+    try {
+      final client = BaseClient();
+      const url = "http://localhost:8000/api/v1/csrf/";
+      final responseJson = await client.get(url, null);
+      final headers = responseJson["headers"];
+      String csrfToken = parseCsrfTokenFromCookie(headers['set-cookie']);
+
+      return csrfToken;
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  String parseCsrfTokenFromCookie(String setCookieHeader) {
+    if (setCookieHeader.isNotEmpty) {
+      List<String> cookies = setCookieHeader.split('; ');
+      for (String cookie in cookies) {
+        if (cookie.startsWith('csrftoken=')) {
+          return cookie.substring('csrftoken='.length);
+        }
+      }
+    }
+    return "";
+  }
+
   Future<List<Plant>> getPlants(String searchQuery,
       {required limit, required offset}) async {
     try {
       final client = BaseClient();
       var url =
-          'https://medi-leaf-backend.vercel.app/api/v1/plants/?search=$searchQuery&limit=$limit&offset=$offset';
+          'http://localhost:8000/api/v1/plants/?search=$searchQuery&limit=$limit&offset=$offset';
 
       final responseJson = await client.get(url, null);
       final plants = json.decode(responseJson["body"])["results"];
@@ -45,13 +70,16 @@ class RemoteService {
   Future<dynamic> login(String email, String password) async {
     try {
       final client = BaseClient();
-      var url = 'https://medi-leaf-backend.vercel.app/api/v1/login/';
-
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      var url = 'http://localhost:8000/api/v1/login/';
+      final headers = {
+        'Cookie': 'csrftoken=${prefs.get("csrfToken1")}',
+        'X-CSRFToken': '${prefs.get("csrfToken1")}'
+      };
       Map<String, dynamic> payLoad = {"email": email, "password": password};
 
-      final response = await client.post(url, payLoad);
+      final response = await client.post(url, payLoad, headers: headers);
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
       final regex = RegExp(r'(csrftoken|sessionid)=([^;]+)');
       final matches = regex.allMatches(response["headers"]["set-cookie"]!);
 
@@ -81,7 +109,12 @@ class RemoteService {
       String password, String country, String phoneNumber) async {
     try {
       final client = BaseClient();
-      var url = 'https://medi-leaf-backend.vercel.app/api/v1/signup/';
+      var url = 'http://localhost:8000/api/v1/signup/';
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final headers = {
+        'Cookie': 'csrftoken=${prefs.get("csrfToken1")}',
+        'X-CSRFToken': '${prefs.get("csrfToken1")}'
+      };
 
       Map<String, dynamic> payLoad = {
         "email": email,
@@ -93,7 +126,7 @@ class RemoteService {
         "contact": phoneNumber,
       };
 
-      final response = await client.post(url, payLoad);
+      final response = await client.post(url, payLoad, headers: headers);
 
       return jsonDecode(response["body"]);
     } catch (error) {
@@ -107,7 +140,7 @@ class RemoteService {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final headers = {'Cookie': 'sessionid=${prefs.get("sessionId")}'};
 
-      var url = "https://medi-leaf-backend.vercel.app/api/v1/user-profile/";
+      var url = "http://localhost:8000/api/v1/user-profile/";
 
       final response = await client.get(url, headers);
 
@@ -122,7 +155,12 @@ class RemoteService {
       String subject, String message) async {
     try {
       final client = BaseClient();
-      var url = 'https://medi-leaf-backend.vercel.app/api/v1/contact_us/';
+      var url = 'http://localhost:8000/api/v1/contact_us/';
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final headers = {
+        'Cookie': 'csrftoken=${prefs.get("csrfToken1")}',
+        'X-CSRFToken': '${prefs.get("csrfToken1")}'
+      };
 
       Map<String, dynamic> payLoad = {
         "email": email,
@@ -132,7 +170,7 @@ class RemoteService {
         "message": message,
       };
 
-      final response = await client.post(url, payLoad);
+      final response = await client.post(url, payLoad, headers: headers);
 
       return contactUsFromJson(response["body"]);
     } catch (error) {

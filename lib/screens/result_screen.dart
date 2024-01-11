@@ -34,7 +34,7 @@ class _ResultScreenState extends State<ResultScreen> {
   List _output = [];
   String _error = "";
   bool _loading = true;
-  final String url = "http://127.0.0.1:3001/classify";
+  final String url = "http://127.0.0.1:8080/api/v1/classify/";
 
   detectImage(ConnectivityStatus connectivityStatus) async {
     try {
@@ -58,7 +58,7 @@ class _ResultScreenState extends State<ResultScreen> {
       final mimeType = lookupMimeType(image.path);
 
       request.files.add(await http.MultipartFile.fromPath(
-          "image_field", image.path,
+          "input_image", image.path,
           filename: image.path.split('/').last,
           contentType: MediaType.parse(mimeType!)));
       request.headers.addAll(header);

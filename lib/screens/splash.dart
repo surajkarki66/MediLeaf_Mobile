@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:medileaf/screens/tabs.dart';
+import 'package:medileaf/services/remote_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -13,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
+    fetchCsrfToken();
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
@@ -22,6 +24,16 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       );
     });
+  }
+
+  Future<void> fetchCsrfToken() async {
+    try {
+      final result = await RemoteService().getCSRF();
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("csrfToken1", result);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
